@@ -2,7 +2,7 @@
 *.class
 
 #compiled path
-./target
+target/
 
 # Log file
 *.log
@@ -11,7 +11,7 @@
 *.ctxt
 
 #configuration file
-./config/configuration.json
+config/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
