@@ -2,7 +2,7 @@
 *.class
 
 #compiled path
-target
+target/
 
 # Log file
 *.log
@@ -11,7 +11,7 @@ target
 *.ctxt
 
 #configuration file
-config/configuration.json
+config/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -27,5 +27,3 @@ config/configuration.json
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-target/generated-sources/
-target/generated-test-sources/
