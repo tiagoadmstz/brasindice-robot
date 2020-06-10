@@ -1,7 +1,7 @@
 package io.github.tiagoadmstz.util;
 
 import com.google.gson.Gson;
-import io.github.tiagoadmstz.models.Configuration;
+import io.github.tiagoadmstz.config.Configuration;
 
 import javax.swing.*;
 import java.io.File;
@@ -28,12 +28,27 @@ public class ConfigurationFileUtil {
     public boolean create() {
         try {
             if (!file.exists()) {
-                FileWriter fileWriter = new FileWriter(file);
                 String login = JOptionPane.showInputDialog("Informe o login");
                 String password = JOptionPane.showInputDialog("Informe a senha");
-                fileWriter.write(new Gson().toJson(new Configuration(login, Base64.getEncoder().encodeToString(password.getBytes()))));
-                fileWriter.close();
+                save(new Configuration(login, password));
             }
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Save configuration file
+     *
+     * @return true if successful
+     */
+    public boolean save(Configuration configuration) {
+        try {
+            FileWriter fileWriter = new FileWriter(file);
+            fileWriter.write(new Gson().toJson(configuration.cloneWithEncodedPassword()));
+            fileWriter.close();
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
