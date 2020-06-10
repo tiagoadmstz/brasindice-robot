@@ -2,11 +2,12 @@ package io.github.tiagoadmstz.util;
 
 import com.google.gson.Gson;
 import io.github.tiagoadmstz.config.Configuration;
+import org.apache.commons.io.IOUtils;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.nio.file.Files;
 import java.util.Base64;
 import java.util.stream.Collectors;
 
@@ -63,7 +64,7 @@ public class ConfigurationFileUtil {
      */
     public Configuration load() {
         try {
-            Configuration configuration = new Gson().fromJson(Files.readAllLines(file.toPath()).stream().collect(Collectors.joining()), Configuration.class);
+            Configuration configuration = new Gson().fromJson(IOUtils.readLines(new FileInputStream(file)).stream().collect(Collectors.joining()), Configuration.class);
             configuration.setPassword(new String(Base64.getDecoder().decode(configuration.getPassword())));
             return configuration;
         } catch (Exception ex) {

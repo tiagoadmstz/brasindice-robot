@@ -158,6 +158,7 @@ public final class BrasindiceRobot {
 
     /**
      * Verify if installed edition is updated
+     *
      * @param lastEdition
      * @return
      */

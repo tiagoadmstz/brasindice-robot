@@ -3,6 +3,7 @@ package io.github.tiagoadmstz;
 import io.github.tiagoadmstz.config.Configuration;
 import io.github.tiagoadmstz.robots.BrasindiceRobot;
 import io.github.tiagoadmstz.util.ConfigurationFileUtil;
+import io.github.tiagoadmstz.util.WindowsUtil;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -62,6 +63,19 @@ public class BrasindiceRobotRobotApplicationTest {
     public void downloadBransindiceDatabaseTest() {
         logger.info(() -> "Downloading database file and saving into installation folder");
         new BrasindiceRobot().downloadBrasindiceDatabase();
+    }
+
+    @Test
+    @Order(6)
+    public void createDesktopShortcutTest() {
+        logger.info(() -> "Creating desktop shortcut");
+        assertTrue(new WindowsUtil().createDesktopShortcut());
+    }
+
+    @Test
+    @Order(7)
+    public void openBrasindiceSoftwareTest() {
+        new WindowsUtil().openBrasindiceSoftware();
     }
 
 }
