@@ -63,99 +63,40 @@ public class WindowsUtil {
     }
 
     /**
-     * Open brasindice software
+     * Opens Brasindice software and configure database
      */
-    public void openBrasindiceSoftware() {
+    public void openBrasindiceSoftwareAndConfigureDatabase() {
         try {
-            Process process = Runtime.getRuntime().exec(configuration.getSetupPath() + "\\Brasindice.exe");
+            Runtime.getRuntime().exec(configuration.getSetupPath() + "\\Brasindice.exe");
             Robot robot = new Robot();
-            robot.delay(5000);
-            robot.keyPress(KeyEvent.VK_ALT);
-            robot.keyRelease(KeyEvent.VK_ALT);
-            robot.keyPress(KeyEvent.VK_RIGHT);
-            robot.keyRelease(KeyEvent.VK_RIGHT);
-            robot.keyPress(KeyEvent.VK_RIGHT);
-            robot.keyRelease(KeyEvent.VK_RIGHT);
-            robot.keyPress(KeyEvent.VK_RIGHT);
-            robot.keyRelease(KeyEvent.VK_RIGHT);
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-            robot.delay(1000);
-            robot.keyPress(KeyEvent.VK_TAB);
-            robot.keyRelease(KeyEvent.VK_TAB);
-            robot.keyPress(KeyEvent.VK_TAB);
-            robot.keyRelease(KeyEvent.VK_TAB);
-            robot.keyPress(KeyEvent.VK_TAB);
-            robot.keyRelease(KeyEvent.VK_TAB);
-            robot.keyPress(KeyEvent.VK_TAB);
-            robot.keyRelease(KeyEvent.VK_TAB);
-            robot.keyPress(KeyEvent.VK_TAB);
-            robot.keyRelease(KeyEvent.VK_TAB);
-            robot.keyPress(KeyEvent.VK_TAB);
-            robot.keyRelease(KeyEvent.VK_TAB);
-            robot.keyPress(KeyEvent.VK_DOWN);
-            robot.keyRelease(KeyEvent.VK_DOWN);
-            robot.keyPress(KeyEvent.VK_DOWN);
-            robot.keyRelease(KeyEvent.VK_DOWN);
-            robot.keyPress(KeyEvent.VK_DOWN);
-            robot.keyRelease(KeyEvent.VK_DOWN);
-            robot.keyPress(KeyEvent.VK_SPACE);
-            robot.keyRelease(KeyEvent.VK_SPACE);
-            robot.delay(1000);
-            robot.keyPress(KeyEvent.VK_TAB);
-            robot.keyRelease(KeyEvent.VK_TAB);
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-            robot.delay(1000);
-            robot.keyPress(KeyEvent.VK_DOWN);
-            robot.keyRelease(KeyEvent.VK_DOWN);
-
-            robot.keyPress(KeyEvent.VK_B);
-            robot.keyRelease(KeyEvent.VK_B);
-            robot.keyPress(KeyEvent.VK_R);
-            robot.keyRelease(KeyEvent.VK_R);
-            robot.keyPress(KeyEvent.VK_A);
-            robot.keyRelease(KeyEvent.VK_A);
-            robot.keyPress(KeyEvent.VK_S);
-            robot.keyRelease(KeyEvent.VK_S);
-            robot.keyPress(KeyEvent.VK_I);
-            robot.keyRelease(KeyEvent.VK_I);
-            robot.keyPress(KeyEvent.VK_N);
-            robot.keyRelease(KeyEvent.VK_N);
-            robot.keyPress(KeyEvent.VK_D);
-            robot.keyRelease(KeyEvent.VK_D);
-            robot.keyPress(KeyEvent.VK_I);
-            robot.keyRelease(KeyEvent.VK_I);
-            robot.keyPress(KeyEvent.VK_C);
-            robot.keyRelease(KeyEvent.VK_C);
-            robot.keyPress(KeyEvent.VK_E);
-            robot.keyRelease(KeyEvent.VK_E);
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-            robot.delay(1000);
-            robot.keyPress(KeyEvent.VK_DOWN);
-            robot.keyRelease(KeyEvent.VK_DOWN);
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-            robot.delay(15000);
-            robot.keyPress(KeyEvent.VK_ENTER);
-            robot.keyRelease(KeyEvent.VK_ENTER);
-            //process.destroy();
+            Integer[][] commands = new Integer[][]{
+                    {null, 5000},
+                    {KeyEvent.VK_ALT, 1}, {KeyEvent.VK_RIGHT, 3}, {KeyEvent.VK_ENTER, 3},
+                    {null, 2000},
+                    {KeyEvent.VK_TAB, 6}, {KeyEvent.VK_DOWN, 3}, {KeyEvent.VK_SPACE, 1},
+                    {null, 2000},
+                    {KeyEvent.VK_TAB, 1}, {KeyEvent.VK_ENTER, 1},
+                    {null, 2000},
+                    {KeyEvent.VK_DOWN, 1},
+                    {KeyEvent.VK_B, 1}, {KeyEvent.VK_R, 1}, {KeyEvent.VK_A, 1}, {KeyEvent.VK_S, 1}, {KeyEvent.VK_I, 1},
+                    {KeyEvent.VK_N, 1}, {KeyEvent.VK_D, 1}, {KeyEvent.VK_I, 1}, {KeyEvent.VK_C, 1}, {KeyEvent.VK_E, 1},
+                    {KeyEvent.VK_ENTER, 1},
+                    {null, 2000},
+                    {KeyEvent.VK_DOWN, 1}, {KeyEvent.VK_ENTER, 1},
+                    {null, 15000},
+                    {KeyEvent.VK_ENTER, 1}
+            };
+            for (Integer[] command : commands) {
+                if (command[0] == null) robot.delay(command[1]);
+                else {
+                    for (int r = 0; r < command[1]; r++) {
+                        robot.keyPress(command[0]);
+                        robot.keyRelease(command[0]);
+                    }
+                }
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
-        }
-    }
-
-    private void keyStrokeArray(Robot robot, int[][] keys) {
-        for (int key = 0; key < keys.length; key++) {
-            for (int repeat = 0; repeat < keys[key][1]; repeat++) {
-                robot.keyPress(keys[key][0]);
-                robot.keyRelease(keys[key][0]);
-            }
         }
     }
 
