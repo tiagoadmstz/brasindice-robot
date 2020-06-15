@@ -75,7 +75,7 @@ public class BrasindiceRobotRobotApplicationTest {
     @Test
     @Order(7)
     public void openBrasindiceSoftwareTest() {
-        new WindowsUtil().openBrasindiceSoftwareAndConfigureDatabase();
+        new WindowsUtil().openBrasindiceSoftwareAndConfigureDatabaseV2();
     }
 
 }

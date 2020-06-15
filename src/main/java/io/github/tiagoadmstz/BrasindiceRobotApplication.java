@@ -26,7 +26,7 @@ public class BrasindiceRobotApplication {
         brasindiceRobot.downloadBrasindiceDatabase();
         WindowsUtil windowsUtil = new WindowsUtil();
         windowsUtil.createDesktopShortcut();
-        windowsUtil.openBrasindiceSoftwareAndConfigureDatabase();
+        windowsUtil.openBrasindiceSoftwareAndConfigureDatabaseV2();
     }
 
 }
