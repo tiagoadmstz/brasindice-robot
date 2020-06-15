@@ -24,3 +24,5 @@ Install Winrar software
     "password": "XXXXXXXX"
 }
 ```
+
+![knowhow](https://github.com/tiagoadmstz/brasindice-robot/blob/master/kh.gif)
