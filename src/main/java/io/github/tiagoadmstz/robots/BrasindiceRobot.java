@@ -5,6 +5,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import io.github.tiagoadmstz.config.Configuration;
 import io.github.tiagoadmstz.util.ConfigurationFileUtil;
+import io.github.tiagoadmstz.util.MESSAGES;
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -140,20 +141,42 @@ public final class BrasindiceRobot {
         try {
             String lastEditionFileName = getLastEditonFileName();
             if (!isUptaded(lastEditionFileName)) {
-                configuration.setLastEdition(lastEditionFileName);
-                new ConfigurationFileUtil().save(configuration);
-                File lastEditionFile = new File(configuration.getSetupPath().getPath() + "/" + lastEditionFileName);
-                String toUriString = UriComponentsBuilder.fromHttpUrl(configuration.getUrlUploads()).path("/" + lastEditionFileName).toUriString();
-                BufferedOutputStream lastEdition = new RestTemplate().execute(toUriString, HttpMethod.GET, null, clientHttpResponse -> {
-                    BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(lastEditionFile));
-                    StreamUtils.copy(clientHttpResponse.getBody(), bufferedOutputStream);
-                    return bufferedOutputStream;
-                });
-                lastEdition.close();
+                if (MESSAGES.UPDATE(isFirstInstallation(lastEditionFileName))) {
+                    deleteBrasindiceDatabase(configuration.getLastEdition());
+                    configuration.setLastEdition(lastEditionFileName);
+                    new ConfigurationFileUtil().save(configuration);
+                    File lastEditionFile = new File(configuration.getSetupPath().getPath() + "/" + lastEditionFileName);
+                    String toUriString = UriComponentsBuilder.fromHttpUrl(configuration.getUrlUploads()).path("/" + lastEditionFileName).toUriString();
+                    BufferedOutputStream lastEdition = new RestTemplate().execute(toUriString, HttpMethod.GET, null, clientHttpResponse -> {
+                        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(lastEditionFile));
+                        StreamUtils.copy(clientHttpResponse.getBody(), bufferedOutputStream);
+                        return bufferedOutputStream;
+                    });
+                    lastEdition.close();
+                    MESSAGES.UPDATE_SUCCESS(isFirstInstallation(lastEditionFileName));
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    /**
+     * Delete last database file in installation folder
+     *
+     * @param edition Ex: 950c.GDB
+     * @return true if successful
+     */
+    private boolean deleteBrasindiceDatabase(String edition) {
+        try {
+            if (!isFirstInstallation(edition)) {
+                new File(configuration.getSetupPath().getPath() + "/" + edition).delete();
+            }
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -164,6 +187,16 @@ public final class BrasindiceRobot {
      */
     private boolean isUptaded(String lastEdition) {
         return configuration.getLastEdition().equals(lastEdition);
+    }
+
+    /**
+     * Verify if is first installation
+     *
+     * @param edition
+     * @return true if is first installation
+     */
+    private boolean isFirstInstallation(String edition) {
+        return edition == null & "".equals(edition);
     }
 
 }
