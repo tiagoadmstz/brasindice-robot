@@ -141,9 +141,8 @@ public final class BrasindiceRobot {
         try {
             String lastEditionFileName = getLastEditonFileName();
             if (!isUptaded(lastEditionFileName)) {
-                if (MESSAGES.UPDATE(isFirstInstallation(lastEditionFileName))) {
+                if (MESSAGES.UPDATE(isFirstInstallation())) {
                     deleteBrasindiceDatabase(configuration.getLastEdition());
-                    configuration.setLastEdition(lastEditionFileName);
                     new ConfigurationFileUtil().save(configuration);
                     File lastEditionFile = new File(configuration.getSetupPath().getPath() + "/" + lastEditionFileName);
                     String toUriString = UriComponentsBuilder.fromHttpUrl(configuration.getUrlUploads()).path("/" + lastEditionFileName).toUriString();
@@ -153,7 +152,8 @@ public final class BrasindiceRobot {
                         return bufferedOutputStream;
                     });
                     lastEdition.close();
-                    MESSAGES.UPDATE_SUCCESS(isFirstInstallation(lastEditionFileName));
+                    MESSAGES.UPDATE_SUCCESS(isFirstInstallation());
+                    configuration.setLastEdition(lastEditionFileName);
                 }
             }
         } catch (Exception ex) {
@@ -169,7 +169,7 @@ public final class BrasindiceRobot {
      */
     private boolean deleteBrasindiceDatabase(String edition) {
         try {
-            if (!isFirstInstallation(edition)) {
+            if (!isFirstInstallation()) {
                 new File(configuration.getSetupPath().getPath() + "/" + edition).delete();
             }
             return true;
@@ -192,11 +192,10 @@ public final class BrasindiceRobot {
     /**
      * Verify if is first installation
      *
-     * @param edition
      * @return true if is first installation
      */
-    private boolean isFirstInstallation(String edition) {
-        return edition == null & "".equals(edition);
+    private boolean isFirstInstallation() {
+        return configuration.getLastEdition() == null || "".equals(configuration.getLastEdition());
     }
 
 }
