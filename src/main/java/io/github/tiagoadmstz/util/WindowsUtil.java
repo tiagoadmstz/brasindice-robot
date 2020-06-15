@@ -100,4 +100,44 @@ public class WindowsUtil {
         }
     }
 
+    /**
+     * Opens Brasindice software and configure database
+     */
+    public void openBrasindiceSoftwareAndConfigureDatabaseV2() {
+        try {
+            Runtime.getRuntime().exec(configuration.getSetupPath() + "\\Brasindice.exe");
+            Robot robot = new Robot();
+            Integer[][] commands = new Integer[][]{
+                    {null, 5000},
+                    {KeyEvent.VK_ALT, 1}, {KeyEvent.VK_RIGHT, 3}, {KeyEvent.VK_ENTER, 3},
+                    {null, 2000},
+                    {KeyEvent.VK_TAB, 6}, {KeyEvent.VK_DOWN, 3}, {KeyEvent.VK_SPACE, 1},
+                    {null, 2000},
+                    {KeyEvent.VK_TAB, 1},
+                    {KeyEvent.VK_D, 1}, {KeyEvent.VK_I, 1}, {KeyEvent.VK_S, 1}, {KeyEvent.VK_C, 1}, {KeyEvent.VK_O, 1},
+                    {KeyEvent.VK_ENTER, 1},
+                    {null, 2000},
+                    {KeyEvent.VK_DOWN, 1},
+                    {KeyEvent.VK_B, 1}, {KeyEvent.VK_R, 1}, {KeyEvent.VK_A, 1}, {KeyEvent.VK_S, 1}, {KeyEvent.VK_I, 1},
+                    {KeyEvent.VK_N, 1}, {KeyEvent.VK_D, 1}, {KeyEvent.VK_I, 1}, {KeyEvent.VK_C, 1}, {KeyEvent.VK_E, 1},
+                    {KeyEvent.VK_ENTER, 1},
+                    {null, 2000},
+                    {KeyEvent.VK_DOWN, 1}, {KeyEvent.VK_ENTER, 1},
+                    {null, 15000},
+                    {KeyEvent.VK_ENTER, 1}
+            };
+            for (Integer[] command : commands) {
+                if (command[0] == null) robot.delay(command[1]);
+                else {
+                    for (int r = 0; r < command[1]; r++) {
+                        robot.keyPress(command[0]);
+                        robot.keyRelease(command[0]);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
 }
