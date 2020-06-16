@@ -1,5 +1,4 @@
 language: java
-jdk:
-  - oraclejdk8
+os: windows
 script:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
