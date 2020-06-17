@@ -14,11 +14,9 @@ import java.util.stream.Collectors;
 public class ConfigurationFileUtil {
 
     private final File file;
-    private final String privateKey;
 
     public ConfigurationFileUtil() {
         this.file = new File(System.getProperty("user.dir") + "/config/configuration.json");
-        this.privateKey = "br4S1nD1c3";
     }
 
     /**

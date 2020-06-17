@@ -19,7 +19,14 @@ Install Winrar software
     "url-download": "http://www.brasindiceRobot.com.br/Arquivos/bras8-5.rar",
     "url-edition-archives-list": "http://www.brasindiceRobot.com.br/Admin/Arquivos",
     "url-uploads": "http://www.brasindiceRobot.com.br/Uploads",
-    "last-edition": "950c.GDB"
+    "last-edition": "950c.GDB",
+    "last-edition-date": "05/06/2020",
+    "export-file-names": {
+        "pmc": "PMC_ddMMyyyy",
+        "pfb": "PFB_ddMMyyyy",
+        "solucao": "Solucao_ddMMyyyy",
+        "material": "Material_ddMMyyyy",
+    }, 
     "login": "12345",
     "password": "XXXXXXXX"
 }

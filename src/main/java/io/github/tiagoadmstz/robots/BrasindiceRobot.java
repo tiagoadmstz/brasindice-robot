@@ -1,11 +1,13 @@
 package io.github.tiagoadmstz.robots;
 
+import br.com.dev.engine.date.Datas;
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import io.github.tiagoadmstz.config.Configuration;
 import io.github.tiagoadmstz.util.ConfigurationFileUtil;
 import io.github.tiagoadmstz.util.MESSAGES;
+import io.github.tiagoadmstz.util.WindowsUtil;
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,6 +21,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.time.format.DateTimeFormatter;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
 
@@ -110,10 +113,10 @@ public final class BrasindiceRobot {
     /**
      * Finds last edition of the Brasindice database file
      *
-     * @return String with name for database Brasindice
+     * @return String[] with date and name for database Brasindice
      * @throws IOException
      */
-    public String getLastEditonFileName() throws IOException {
+    public String[] getLastEditonFileNameAndDate() throws IOException {
         String cookie = loginAndGetCookie();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Cookie", cookie);
@@ -124,12 +127,17 @@ public final class BrasindiceRobot {
                 .cookie("Cookie", cookie)
                 .get();
 
-        String lastEditionFile = null;
-        ListIterator<Element> elementListIterator = docCustomConn.getElementsByTag("td").listIterator(1);
+        String[] lastEditionFile = new String[2];
+        ListIterator<Element> elementListIterator = docCustomConn.getElementsByTag("td").listIterator(0);
         while (elementListIterator.hasNext()) {
             Element element = elementListIterator.next();
-            lastEditionFile = String.format("%sc.GDB", element.text().replace("Edição ", "").replace(" link direto gdb", ""));
-            break;
+            if (lastEditionFile[0] == null) {
+                lastEditionFile[0] = element.text();
+            } else {
+                lastEditionFile[1] = String.format("%sc.GDB", element.text().replace("Edição ", "").replace(" link direto gdb", ""));
+                break;
+            }
+            continue;
         }
         return lastEditionFile;
     }
@@ -139,13 +147,13 @@ public final class BrasindiceRobot {
      */
     public void downloadBrasindiceDatabase() {
         try {
-            String lastEditionFileName = getLastEditonFileName();
-            if (!isUptaded(lastEditionFileName)) {
+            String[] lastEditionFileNameAndDate = getLastEditonFileNameAndDate();
+            if (!isUptaded(lastEditionFileNameAndDate[1])) {
                 if (MESSAGES.UPDATE(isFirstInstallation())) {
                     deleteBrasindiceDatabase(configuration.getLastEdition());
                     new ConfigurationFileUtil().save(configuration);
-                    File lastEditionFile = new File(configuration.getSetupPath().getPath() + "/" + lastEditionFileName);
-                    String toUriString = UriComponentsBuilder.fromHttpUrl(configuration.getUrlUploads()).path("/" + lastEditionFileName).toUriString();
+                    File lastEditionFile = new File(configuration.getSetupPath().getPath() + "/" + lastEditionFileNameAndDate);
+                    String toUriString = UriComponentsBuilder.fromHttpUrl(configuration.getUrlUploads()).path("/" + lastEditionFileNameAndDate).toUriString();
                     BufferedOutputStream lastEdition = new RestTemplate().execute(toUriString, HttpMethod.GET, null, clientHttpResponse -> {
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(lastEditionFile));
                         StreamUtils.copy(clientHttpResponse.getBody(), bufferedOutputStream);
@@ -153,12 +161,50 @@ public final class BrasindiceRobot {
                     });
                     lastEdition.close();
                     MESSAGES.UPDATE_SUCCESS(isFirstInstallation());
-                    configuration.setLastEdition(lastEditionFileName);
+                    configuration.setLastEditionDate(Datas.stringToLocalDate(lastEditionFileNameAndDate[0]));
+                    configuration.setLastEdition(lastEditionFileNameAndDate[1]);
                 }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+    }
+
+    /**
+     * Exports PMC, PFB, Solution and Material file
+     *
+     * @return true if successful
+     */
+    public boolean exportBrasindiceFiles() {
+        try {
+            String pmc = getFormattedExportFileName(configuration.getExportDataFile().getPmc());
+            String pfb = getFormattedExportFileName(configuration.getExportDataFile().getPfb());
+            String solution = getFormattedExportFileName(configuration.getExportDataFile().getSolucao());
+            String material = getFormattedExportFileName(configuration.getExportDataFile().getMaterial());
+            File pmcFile = new File(configuration.getSetupPath() + "/" + pmc + ".txt");
+            File pfbFile = new File(configuration.getSetupPath() + "/" + pfb + ".txt");
+            File solutionFile = new File(configuration.getSetupPath() + "/" + solution + ".txt");
+            File materialFile = new File(configuration.getSetupPath() + "/" + material + ".txt");
+            new WindowsUtil().exportBrasindiceFiles(pmc, pfb, solution, material);
+            //pmcFile.delete();
+            //pfbFile.delete();
+            //solutionFile.delete();
+            //materialFile.delete();
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Get formatted file name
+     *
+     * @param fileName
+     * @return
+     */
+    private String getFormattedExportFileName(String fileName) {
+        return fileName.replaceAll("_.*", "_") + configuration.getLastEditionDate().format(DateTimeFormatter.ofPattern(fileName.replaceAll(".*_", "")));
     }
 
     /**
