@@ -43,6 +43,10 @@ public class BrasindiceRobotConfiguration implements Serializable {
     private String lastEditionDate = "";
     @SerializedName("remove-accetuation")
     private Boolean removeAccentuation = false;
+    @SerializedName("delete-exported-files")
+    private Boolean deleteExportedFiles = false;
+    @SerializedName("save-into-network-database")
+    private Boolean saveIntoNetworkDatabase = false;
     @SerializedName("export-file-names")
     private ExportDataFileConfiguration exportDataFile = new ExportDataFileConfiguration();
     private String login = "";

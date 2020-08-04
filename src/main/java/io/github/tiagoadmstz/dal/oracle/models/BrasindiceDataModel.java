@@ -1,5 +1,7 @@
 package io.github.tiagoadmstz.dal.oracle.models;
 
+import io.github.tiagoadmstz.dal.converters.PortariaPisCofinsConverter;
+import io.github.tiagoadmstz.dal.converters.TipoMatMedConverter;
 import io.github.tiagoadmstz.enumerated.PORTARIA_PISCOFINS;
 import io.github.tiagoadmstz.enumerated.TIPO_MAT_MED;
 import lombok.*;
@@ -25,11 +27,13 @@ import java.time.LocalDate;
         @Index(name = "XPP001CAD_BRASINDICE", columnList = "CODIGO_LABORATORIO,CODIGO_MEDICAMENTO,DATA_IMPORTACAO"),
         @Index(name = "XPP002CAD_BRASINDICE", columnList = "DATA_IMPORTACAO")
 })
+@SequenceGenerator(name = "SEQ_CAD_BRASINDICE", allocationSize = 1)
 public class BrasindiceDataModel implements Serializable {
 
     private static final long serialVersionUID = -7947433967808749873L;
     @Id
     @Column(name = "ID_INSERCAO")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_CAD_BRASINDICE")
     private Long idInsercao;
     @Builder.Default
     @Column(name = "DATA_IMPORTACAO", columnDefinition = "date")
@@ -61,6 +65,7 @@ public class BrasindiceDataModel implements Serializable {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "PORTARIA_PISCOFINS", length = 1)
+    @Convert(converter = PortariaPisCofinsConverter.class)
     private PORTARIA_PISCOFINS portariaPisCofins = PORTARIA_PISCOFINS.NAO;
     @Column(name = "CODIGO_BARRA_EAN", length = 13)
     private String codigoBarraEan;
@@ -80,6 +85,7 @@ public class BrasindiceDataModel implements Serializable {
     @Builder.Default
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "TIPO_MAT_MED", length = 1)
+    @Convert(converter = TipoMatMedConverter.class)
     private TIPO_MAT_MED tipoMatMed = TIPO_MAT_MED.USO_CONSUMO_HOSPILAR;
 
 }

@@ -6,7 +6,7 @@ public abstract class MESSAGES {
 
     public static boolean UPDATE(boolean firstIstallation) {
         if (!firstIstallation) {
-            return JOptionPane.showConfirmDialog(null, "Existe uma atualização disponível para o Brasindice, deseja atualizar agora?") == 1;
+            return JOptionPane.showConfirmDialog(null, "Existe uma atualização disponível para o Brasindice, deseja atualizar agora?") == 0;
         }
         return true;
     }
@@ -18,7 +18,7 @@ public abstract class MESSAGES {
     }
 
     public static boolean EXPORT_DATA_FILES() {
-        return JOptionPane.showConfirmDialog(null, "Deseja exportar os arquivos do Brasindice agora?") == 1;
+        return JOptionPane.showConfirmDialog(null, "Deseja exportar os arquivos do Brasindice agora?") == 0;
     }
 
     public static void EXPORT_DATA_FILES_SUCCESS(boolean success) {

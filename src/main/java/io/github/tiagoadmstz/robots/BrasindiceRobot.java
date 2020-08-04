@@ -5,7 +5,11 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import io.github.tiagoadmstz.config.BrasindiceRobotConfiguration;
+import io.github.tiagoadmstz.config.SpringContext;
+import io.github.tiagoadmstz.dal.oracle.models.BrasindiceDataModel;
+import io.github.tiagoadmstz.dal.oracle.repositories.BrasindiceDataModelRepository;
 import io.github.tiagoadmstz.util.ConfigurationFileUtil;
+import io.github.tiagoadmstz.util.ImportBrasindiceUtil;
 import io.github.tiagoadmstz.util.MESSAGES;
 import io.github.tiagoadmstz.util.WindowsUtil;
 import org.apache.commons.io.IOUtils;
@@ -22,6 +26,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.*;
 import java.nio.file.Files;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
 
@@ -33,6 +38,11 @@ public final class BrasindiceRobot {
     public BrasindiceRobot() {
         this.brasindiceRobotConfiguration = new ConfigurationFileUtil().load();
         initWebClient();
+    }
+
+    public void installOrUpdateAndExportDataFilesAndInsertInNetworkDataBase() {
+        installOrUpdate();
+        exportDataFilesAndInsertInNetworkDataBase();
     }
 
     /**
@@ -49,6 +59,17 @@ public final class BrasindiceRobot {
             downloadBrasindiceSoftwareAndUnrar();
         } else {
             downloadAndConfigureBrasindiceDatabase();
+        }
+    }
+
+    public void exportDataFilesAndInsertInNetworkDataBase() {
+        if (MESSAGES.EXPORT_DATA_FILES()) {
+            boolean exportSuccess = exportBrasindiceFiles();
+            if (exportSuccess) {
+                importBrasindiceFiles(brasindiceRobotConfiguration.getSaveIntoNetworkDatabase());
+                if (brasindiceRobotConfiguration.getDeleteExportedFiles()) deleteExportedFiles();
+            }
+            MESSAGES.EXPORT_DATA_FILES_SUCCESS(exportSuccess);
         }
     }
 
@@ -168,9 +189,8 @@ public final class BrasindiceRobot {
             if (!isUptaded(lastEditionFileNameAndDate[1])) {
                 if (MESSAGES.UPDATE(isFirstInstallation())) {
                     deleteBrasindiceDatabase(brasindiceRobotConfiguration.getLastEdition());
-                    new ConfigurationFileUtil().save(brasindiceRobotConfiguration);
-                    File lastEditionFile = new File(brasindiceRobotConfiguration.getSetupPath().getPath() + "/" + lastEditionFileNameAndDate);
-                    String toUriString = UriComponentsBuilder.fromHttpUrl(brasindiceRobotConfiguration.getUrlUploads()).path("/" + lastEditionFileNameAndDate).toUriString();
+                    File lastEditionFile = new File(brasindiceRobotConfiguration.getSetupPath().getPath() + "/" + lastEditionFileNameAndDate[1]);
+                    String toUriString = UriComponentsBuilder.fromHttpUrl(brasindiceRobotConfiguration.getUrlUploads()).path("/" + lastEditionFileNameAndDate[1]).toUriString();
                     BufferedOutputStream lastEdition = new RestTemplate().execute(toUriString, HttpMethod.GET, null, clientHttpResponse -> {
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(lastEditionFile));
                         StreamUtils.copy(clientHttpResponse.getBody(), bufferedOutputStream);
@@ -180,14 +200,11 @@ public final class BrasindiceRobot {
                     MESSAGES.UPDATE_SUCCESS(isFirstInstallation());
                     brasindiceRobotConfiguration.setLastEditionDate(Datas.stringToLocalDate(lastEditionFileNameAndDate[0]));
                     brasindiceRobotConfiguration.setLastEdition(lastEditionFileNameAndDate[1]);
+                    new ConfigurationFileUtil().save(brasindiceRobotConfiguration);
                     //configures database in Brasindice software
                     WindowsUtil windowsUtil = new WindowsUtil();
                     windowsUtil.createDesktopShortcut();
                     windowsUtil.openBrasindiceSoftwareAndConfigureDatabaseV2();
-                    //exports all database files
-                    if (MESSAGES.EXPORT_DATA_FILES()) {
-                        MESSAGES.EXPORT_DATA_FILES_SUCCESS(exportBrasindiceFiles());
-                    }
                 }
             }
         } catch (Exception ex) {
@@ -202,24 +219,42 @@ public final class BrasindiceRobot {
      */
     public boolean exportBrasindiceFiles() {
         try {
-            String pmc = getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getPmc());
-            String pfb = getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getPfb());
-            String solution = getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getSolucao());
-            String material = getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getMaterial());
-            File pmcFile = new File(brasindiceRobotConfiguration.getSetupPath() + "/" + pmc + ".txt");
-            File pfbFile = new File(brasindiceRobotConfiguration.getSetupPath() + "/" + pfb + ".txt");
-            File solutionFile = new File(brasindiceRobotConfiguration.getSetupPath() + "/" + solution + ".txt");
-            File materialFile = new File(brasindiceRobotConfiguration.getSetupPath() + "/" + material + ".txt");
-            new WindowsUtil().exportBrasindiceFiles(pmc, pfb, solution, material);
-            //pmcFile.delete();
-            //pfbFile.delete();
-            //solutionFile.delete();
-            //materialFile.delete();
+            String[] exportFilesNames = getExportFilesNames();
+            new WindowsUtil().exportBrasindiceFiles(exportFilesNames[0], exportFilesNames[1], exportFilesNames[2], exportFilesNames[3]);
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
         return false;
+    }
+
+    public boolean importBrasindiceFiles(boolean saveIntoNetworkDatabase) {
+        try {
+            BrasindiceDataModelRepository repository = SpringContext.getContext().getBean(BrasindiceDataModelRepository.class);
+            for (String fileName : getExportFilesNames()) {
+                List<BrasindiceDataModel> list = ImportBrasindiceUtil.importBrasindice(brasindiceRobotConfiguration.getLastEditionDate(), true, new File(String.format("C:\\Brasindice\\%s.txt", fileName)));
+                if (saveIntoNetworkDatabase) list.stream().forEach(repository::save);
+            }
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    private void deleteExportedFiles() {
+        for (String fileName : getExportFilesNames()) {
+            new File(brasindiceRobotConfiguration.getSetupPath() + "/" + fileName + ".txt").delete();
+        }
+    }
+
+    private String[] getExportFilesNames() {
+        return new String[]{
+                getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getPmc()),
+                getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getPfb()),
+                getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getSolucao()),
+                getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getMaterial())
+        };
     }
 
     /**

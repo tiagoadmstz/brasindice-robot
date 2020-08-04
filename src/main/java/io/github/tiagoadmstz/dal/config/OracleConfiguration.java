@@ -54,7 +54,7 @@ public class OracleConfiguration {
         entityManagerFactoryBean.setDataSource(dataSource);
         entityManagerFactoryBean.setPackagesToScan(
                 "io.github.tiagoadmstz.dal.oracle.models",
-                "io.github.tiagoadmstz.converters"
+                "io.github.tiagoadmstz.dal.converters"
         );
         entityManagerFactoryBean.setJpaPropertyMap(getProperties());
         entityManagerFactoryBean.setPersistenceUnitName("oraclePU");
