@@ -5,7 +5,7 @@ This project make Download, install and update database file GDB of the digital 
 
 Install Winrar software
 
-# Configuration file
+# External configuration file
 ./config/brasindiceRobotConfiguration.json
 ```
 {
@@ -33,5 +33,19 @@ Install Winrar software
 }
 ```
 
+# YAML confiration file - Database configuration
+./src/main/resources/application.yml
+```
+spring:
+  datasource:
+    brasindice:
+      url: jdbc:firebirdsql:embedded:%s\\BRASDB.GDB?encoding=UNICODE_FSS
+      username: root
+      password: root
+    csps:
+      url: jdbc:oracle:thin:@localhost:1521:base
+      username: root
+      password: root
+```
 
 ![knowhow](https://github.com/tiagoadmstz/brasindice-robot/blob/master/kh.gif)
