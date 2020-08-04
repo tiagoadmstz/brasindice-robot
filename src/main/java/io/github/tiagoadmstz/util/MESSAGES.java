@@ -17,4 +17,16 @@ public abstract class MESSAGES {
         }
     }
 
+    public static boolean EXPORT_DATA_FILES() {
+        return JOptionPane.showConfirmDialog(null, "Deseja exportar os arquivos do Brasindice agora?") == 1;
+    }
+
+    public static void EXPORT_DATA_FILES_SUCCESS(boolean success) {
+        if (success) {
+            JOptionPane.showMessageDialog(null, "Exportação reliazada com sucesso");
+        } else {
+            JOptionPane.showMessageDialog(null, "Erro ao tentar exportar os arquivos, tente novamente mais tarde");
+        }
+    }
+
 }
