@@ -6,7 +6,7 @@ This project make Download, install and update database file GDB of the digital 
 Install Winrar software
 
 # Configuration file
-./config/configuration.json
+./config/brasindiceRobotConfiguration.json
 ```
 {
     "setup-path": {
@@ -21,6 +21,7 @@ Install Winrar software
     "url-uploads": "http://www.brasindiceRobot.com.br/Uploads",
     "last-edition": "950c.GDB",
     "last-edition-date": "05/06/2020",
+    "remove-accentuation": true,
     "export-file-names": {
         "pmc": "PMC_ddMMyyyy",
         "pfb": "PFB_ddMMyyyy",

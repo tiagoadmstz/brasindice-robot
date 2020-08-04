@@ -1,6 +1,6 @@
 package io.github.tiagoadmstz.util;
 
-import io.github.tiagoadmstz.config.Configuration;
+import io.github.tiagoadmstz.config.BrasindiceRobotConfiguration;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.awt.*;
@@ -13,10 +13,10 @@ import java.nio.file.Files;
 public class WindowsUtil {
 
     private final String batFilePath;
-    private final Configuration configuration;
+    private final BrasindiceRobotConfiguration brasindiceRobotConfiguration;
 
     public WindowsUtil() {
-        this.configuration = new ConfigurationFileUtil().load();
+        this.brasindiceRobotConfiguration = new ConfigurationFileUtil().load();
         this.batFilePath = System.getProperty("user.dir") + "/config/shortcut.bat";
     }
 
@@ -51,7 +51,7 @@ public class WindowsUtil {
                         "echo Set oWS = WScript.CreateObject(\"WScript.Shell\") > CreateShortcut.vbs\n" +
                         "echo sLinkFile = \"%HOMEDRIVE%%HOMEPATH%\\Desktop\\Brasindice.lnk\" >> CreateShortcut.vbs\n" +
                         "echo Set oLink = oWS.CreateShortcut(sLinkFile) >> CreateShortcut.vbs\n" +
-                        "echo oLink.TargetPath = \"" + configuration.getSetupPath() + "\\Brasindice.exe\" >> CreateShortcut.vbs\n" +
+                        "echo oLink.TargetPath = \"" + brasindiceRobotConfiguration.getSetupPath() + "\\Brasindice.exe\" >> CreateShortcut.vbs\n" +
                         "echo oLink.Save >> CreateShortcut.vbs\n" +
                         "cscript CreateShortcut.vbs\n" +
                         "del CreateShortcut.vbs";
@@ -69,7 +69,7 @@ public class WindowsUtil {
      */
     public void openBrasindiceSoftwareAndConfigureDatabase() {
         try {
-            Runtime.getRuntime().exec(configuration.getSetupPath() + "\\Brasindice.exe");
+            Runtime.getRuntime().exec(brasindiceRobotConfiguration.getSetupPath() + "\\Brasindice.exe");
             Robot robot = new Robot();
             Integer[][] commands = new Integer[][]{
                     {null, 5000},
@@ -142,14 +142,14 @@ public class WindowsUtil {
             do {
                 if (count == 0) {
                     executeCommands(getCommandsToOpenExportFileFrame("pmc"));
-                    executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 1}, {KeyEvent.VK_RIGHT, 1}, {KeyEvent.VK_TAB, 5}});
+                    executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 6}});
                     confirmExportWithMousePointer();
                     executeCommands(KeyboardUtil.parseStringToKeyEventArray(pmcFileName));
                     executeCommands(getBasicCommandsFileChooser());
                     executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 4}, {KeyEvent.VK_SPACE, 1}, {null, 10000}, {KeyEvent.VK_ENTER, 1}});
                 } else {
                     executeCommands(getCommandsToOpenExportFileFrame("pfb"));
-                    executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 1}, {KeyEvent.VK_RIGHT, 1}, {KeyEvent.VK_TAB, 5}, {KeyEvent.VK_DOWN, 1}});
+                    executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 6}, {KeyEvent.VK_DOWN, 1}});
                     confirmExportWithMousePointer();
                     executeCommands(KeyboardUtil.parseStringToKeyEventArray(pfbFileName));
                     executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 2}, {KeyEvent.VK_SPACE, 1}, {null, 10000}, {KeyEvent.VK_ENTER, 1}});
@@ -169,7 +169,7 @@ public class WindowsUtil {
     private void openSolutionFileExportFrame(String solutionFileName) {
         try {
             executeCommands(getCommandsToOpenExportFileFrame("solucao"));
-            executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 1}, {KeyEvent.VK_RIGHT, 1}});
+            executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 1}});
             confirmExportWithMousePointer();
             executeCommands(KeyboardUtil.parseStringToKeyEventArray(solutionFileName));
             executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 2}, {KeyEvent.VK_SPACE, 1}, {null, 10000}, {KeyEvent.VK_ENTER, 1}});
@@ -186,7 +186,7 @@ public class WindowsUtil {
     private void openMaterialFileExportFrame(String materialFileName) {
         try {
             executeCommands(getCommandsToOpenExportFileFrame("material"));
-            executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 1}, {KeyEvent.VK_RIGHT, 1}});
+            executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 1}});
             confirmExportWithMousePointer();
             executeCommands(KeyboardUtil.parseStringToKeyEventArray(materialFileName));
             executeCommands(new Integer[][]{{KeyEvent.VK_TAB, 2}, {KeyEvent.VK_SPACE, 1}, {null, 10000}, {KeyEvent.VK_ENTER, 1}});
@@ -217,7 +217,7 @@ public class WindowsUtil {
      */
     public void openBrasindiceSoftware() {
         try {
-            Runtime.getRuntime().exec(configuration.getSetupPath() + "\\Brasindice.exe");
+            Runtime.getRuntime().exec(brasindiceRobotConfiguration.getSetupPath() + "\\Brasindice.exe");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -261,7 +261,7 @@ public class WindowsUtil {
      * @param fileName
      * @return
      */
-    public Integer[][] getCommandsToOpenExportFileFrame(String fileName) {
+    private Integer[][] getCommandsToOpenExportFileFrame(String fileName) {
         return new Integer[][]{
                 {null, 5000},
                 {KeyEvent.VK_ALT, 1},
@@ -281,13 +281,13 @@ public class WindowsUtil {
                         {null, 2000},
                         {KeyEvent.VK_TAB, 6}, {KeyEvent.VK_DOWN, 3}, {KeyEvent.VK_SPACE, 1},
                         {null, 2000},
-                        {KeyEvent.VK_TAB, 1},
-                        {KeyEvent.VK_D, 1}, {KeyEvent.VK_I, 1}, {KeyEvent.VK_S, 1}, {KeyEvent.VK_C, 1}, {KeyEvent.VK_O, 1},
+                        {KeyEvent.VK_TAB, 1}},
+                ArrayUtils.addAll(KeyboardUtil.parseStringToKeyEventArray(brasindiceRobotConfiguration.getLocalDiskName()), new Integer[][]{
                         {KeyEvent.VK_ENTER, 1},
                         {null, 2000},
-                        {KeyEvent.VK_DOWN, 1}},
-                KeyboardUtil.parseStringToKeyEventArray("brasindice")),
-                new Integer[][]{{KeyEvent.VK_ENTER, 1}, {null, 2000}}
+                        {KeyEvent.VK_DOWN, 1}})),
+                ArrayUtils.addAll(KeyboardUtil.parseStringToKeyEventArray("brasindice"),
+                        new Integer[][]{{KeyEvent.VK_ENTER, 1}, {null, 2000}})
         );
     }
 

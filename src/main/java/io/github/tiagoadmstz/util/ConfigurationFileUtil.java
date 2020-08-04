@@ -1,7 +1,7 @@
 package io.github.tiagoadmstz.util;
 
 import com.google.gson.Gson;
-import io.github.tiagoadmstz.config.Configuration;
+import io.github.tiagoadmstz.config.BrasindiceRobotConfiguration;
 import org.apache.commons.io.IOUtils;
 
 import javax.swing.*;
@@ -29,7 +29,7 @@ public class ConfigurationFileUtil {
             if (!file.exists()) {
                 String login = JOptionPane.showInputDialog("Informe o login");
                 String password = JOptionPane.showInputDialog("Informe a senha");
-                save(new Configuration(login, password));
+                save(new BrasindiceRobotConfiguration(login, password));
             }
             return true;
         } catch (Exception ex) {
@@ -43,10 +43,10 @@ public class ConfigurationFileUtil {
      *
      * @return true if successful
      */
-    public boolean save(Configuration configuration) {
+    public boolean save(BrasindiceRobotConfiguration brasindiceRobotConfiguration) {
         try {
             FileWriter fileWriter = new FileWriter(file);
-            fileWriter.write(new Gson().toJson(configuration.cloneWithEncodedPassword()));
+            fileWriter.write(new Gson().toJson(brasindiceRobotConfiguration.cloneWithEncodedPassword()));
             fileWriter.close();
             return true;
         } catch (Exception ex) {
@@ -60,11 +60,11 @@ public class ConfigurationFileUtil {
      *
      * @return Configuration class if successful else null
      */
-    public Configuration load() {
+    public BrasindiceRobotConfiguration load() {
         try {
-            Configuration configuration = new Gson().fromJson(IOUtils.readLines(new FileInputStream(file)).stream().collect(Collectors.joining()), Configuration.class);
-            configuration.setPassword(new String(Base64.getDecoder().decode(configuration.getPassword())));
-            return configuration;
+            BrasindiceRobotConfiguration brasindiceRobotConfiguration = new Gson().fromJson(IOUtils.readLines(new FileInputStream(file)).stream().collect(Collectors.joining()), BrasindiceRobotConfiguration.class);
+            brasindiceRobotConfiguration.setPassword(new String(Base64.getDecoder().decode(brasindiceRobotConfiguration.getPassword())));
+            return brasindiceRobotConfiguration;
         } catch (Exception ex) {
             ex.printStackTrace();
         }
