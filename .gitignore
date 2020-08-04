@@ -11,7 +11,7 @@ target/
 *.ctxt
 
 #brasindiceRobotConfiguration file
-config/configration.json
+config/configuration.json
 config/shortcut.bat
 
 # Mobile Tools for Java (J2ME)
