@@ -8,7 +8,10 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Builder
@@ -43,8 +46,14 @@ public class BrasindiceRobotConfiguration implements Serializable {
     private String lastEditionDate = "";
     @SerializedName("remove-accetuation")
     private Boolean removeAccentuation = false;
+    @SerializedName("delete-exported-files")
+    private Boolean deleteExportedFiles = false;
+    @SerializedName("save-into-network-database")
+    private Boolean saveIntoNetworkDatabase = false;
     @SerializedName("export-file-names")
     private ExportDataFileConfiguration exportDataFile = new ExportDataFileConfiguration();
+    @SerializedName("csps-user")
+    private String cspsUser = "PLANO";
     private String login = "";
     private String password = "";
 
@@ -91,6 +100,62 @@ public class BrasindiceRobotConfiguration implements Serializable {
             ex.printStackTrace();
         }
         return brasindiceRobotConfiguration;
+    }
+
+    /**
+     * Verify if installed edition is updated
+     *
+     * @param lastEdition number of the last edition to verify in the configuration file
+     * @return true if updated
+     */
+    public boolean isUptaded(String lastEdition) {
+        return this.lastEdition.equals(lastEdition);
+    }
+
+    /**
+     * Verify if is first installation
+     *
+     * @return true if is first installation
+     */
+    public boolean isFirstInstallation() {
+        return lastEdition == null || "".equals(lastEdition);
+    }
+
+    public File getAtualDatabaseFile() {
+        return new File(setupPath.getPath() + "/" + lastEdition);
+    }
+
+    public String[] getExportFilesNames() {
+        return new String[]{
+                getFormattedExportFileName(exportDataFile.getPmc()),
+                getFormattedExportFileName(exportDataFile.getPfb()),
+                getFormattedExportFileName(exportDataFile.getSolucao()),
+                getFormattedExportFileName(exportDataFile.getMaterial())
+        };
+    }
+
+    public List<File> getExportFiles() {
+        return Arrays.stream(getExportFilesNames())
+                .map(fileName -> new File(setupPath + "/" + fileName + ".txt"))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Get formatted file name
+     *
+     * @param fileName name of the file
+     * @return String with final export file name - Ex: Material_20072020
+     */
+    private String getFormattedExportFileName(String fileName) {
+        return fileName.replaceAll("_.*", "_") + getLastEditionDate().format(DateTimeFormatter.ofPattern(fileName.replaceAll(".*_", "")));
+    }
+
+    public boolean isFilesExported() {
+        boolean result = false;
+        for (String fileName : getExportFilesNames()) {
+            result = new File(setupPath + "/" + fileName + ".txt").exists();
+        }
+        return result;
     }
 
 }

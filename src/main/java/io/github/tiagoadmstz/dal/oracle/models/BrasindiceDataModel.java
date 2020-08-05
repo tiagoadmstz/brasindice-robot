@@ -1,5 +1,7 @@
 package io.github.tiagoadmstz.dal.oracle.models;
 
+import io.github.tiagoadmstz.dal.converters.PortariaPisCofinsConverter;
+import io.github.tiagoadmstz.dal.converters.TipoMatMedConverter;
 import io.github.tiagoadmstz.enumerated.PORTARIA_PISCOFINS;
 import io.github.tiagoadmstz.enumerated.TIPO_MAT_MED;
 import lombok.*;
@@ -25,12 +27,17 @@ import java.time.LocalDate;
         @Index(name = "XPP001CAD_BRASINDICE", columnList = "CODIGO_LABORATORIO,CODIGO_MEDICAMENTO,DATA_IMPORTACAO"),
         @Index(name = "XPP002CAD_BRASINDICE", columnList = "DATA_IMPORTACAO")
 })
+@SequenceGenerator(name = "SEQ_CAD_BRASINDICE", allocationSize = 1)
 public class BrasindiceDataModel implements Serializable {
 
     private static final long serialVersionUID = -7947433967808749873L;
     @Id
+    @Column(name = "SEQUENCIAL", length = 20)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_CAD_BRASINDICE")
+    private Long sequencial;
+    @Builder.Default
     @Column(name = "ID_INSERCAO")
-    private Long idInsercao;
+    private String idInsercao = "PLANO";
     @Builder.Default
     @Column(name = "DATA_IMPORTACAO", columnDefinition = "date")
     private LocalDate dataImportacao = LocalDate.now();
@@ -61,13 +68,12 @@ public class BrasindiceDataModel implements Serializable {
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "PORTARIA_PISCOFINS", length = 1)
+    @Convert(converter = PortariaPisCofinsConverter.class)
     private PORTARIA_PISCOFINS portariaPisCofins = PORTARIA_PISCOFINS.NAO;
     @Column(name = "CODIGO_BARRA_EAN", length = 13)
     private String codigoBarraEan;
     @Column(name = "CODIGO_BRASINDICE_TISS", length = 10)
     private String codigoBrasindiceTiss;
-    @Column(name = "SEQUENCIAL", length = 20)
-    private Long sequencial;
     @Column(name = "COD_TISS", length = 8)
     private String codigoTiss;
     @Column(name = "DATA_PUBLICACAO", columnDefinition = "date")
@@ -80,6 +86,7 @@ public class BrasindiceDataModel implements Serializable {
     @Builder.Default
     @Enumerated(EnumType.ORDINAL)
     @Column(name = "TIPO_MAT_MED", length = 1)
+    @Convert(converter = TipoMatMedConverter.class)
     private TIPO_MAT_MED tipoMatMed = TIPO_MAT_MED.USO_CONSUMO_HOSPILAR;
 
 }

@@ -5,14 +5,16 @@ import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebResponse;
 import io.github.tiagoadmstz.config.BrasindiceRobotConfiguration;
+import io.github.tiagoadmstz.config.SpringContext;
+import io.github.tiagoadmstz.dal.oracle.repositories.BrasindiceDataModelRepository;
 import io.github.tiagoadmstz.util.ConfigurationFileUtil;
+import io.github.tiagoadmstz.util.ImportBrasindiceUtil;
 import io.github.tiagoadmstz.util.MESSAGES;
 import io.github.tiagoadmstz.util.WindowsUtil;
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StreamUtils;
@@ -21,7 +23,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.time.format.DateTimeFormatter;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,11 @@ public final class BrasindiceRobot {
     public BrasindiceRobot() {
         this.brasindiceRobotConfiguration = new ConfigurationFileUtil().load();
         initWebClient();
+    }
+
+    public void installOrUpdateAndExportDataFilesAndInsertInNetworkDataBase() {
+        installOrUpdate();
+        exportDataFilesAndInsertInNetworkDataBase();
     }
 
     /**
@@ -49,6 +55,19 @@ public final class BrasindiceRobot {
             downloadBrasindiceSoftwareAndUnrar();
         } else {
             downloadAndConfigureBrasindiceDatabase();
+        }
+    }
+
+    public void exportDataFilesAndInsertInNetworkDataBase() {
+        if (MESSAGES.EXPORT_DATA_FILES()) {
+            boolean exportSuccess = exportBrasindiceFiles();
+            if (exportSuccess) {
+                boolean saveSuccess = importBrasindiceFiles(brasindiceRobotConfiguration.getSaveIntoNetworkDatabase());
+                if (saveSuccess && brasindiceRobotConfiguration.getDeleteExportedFiles()) {
+                    deleteExportedFiles();
+                }
+            }
+            MESSAGES.EXPORT_DATA_FILES_SUCCESS(exportSuccess);
         }
     }
 
@@ -135,8 +154,6 @@ public final class BrasindiceRobot {
      */
     public String[] getLastEditonFileNameAndDate() throws IOException {
         String cookie = loginAndGetCookie();
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Cookie", cookie);
 
         Document docCustomConn = Jsoup.connect(brasindiceRobotConfiguration.getUrlEditionsArchivesList())
                 .userAgent("Mozilla")
@@ -165,29 +182,25 @@ public final class BrasindiceRobot {
     public void downloadAndConfigureBrasindiceDatabase() {
         try {
             String[] lastEditionFileNameAndDate = getLastEditonFileNameAndDate();
-            if (!isUptaded(lastEditionFileNameAndDate[1])) {
-                if (MESSAGES.UPDATE(isFirstInstallation())) {
-                    deleteBrasindiceDatabase(brasindiceRobotConfiguration.getLastEdition());
-                    new ConfigurationFileUtil().save(brasindiceRobotConfiguration);
-                    File lastEditionFile = new File(brasindiceRobotConfiguration.getSetupPath().getPath() + "/" + lastEditionFileNameAndDate);
-                    String toUriString = UriComponentsBuilder.fromHttpUrl(brasindiceRobotConfiguration.getUrlUploads()).path("/" + lastEditionFileNameAndDate).toUriString();
+            if (!brasindiceRobotConfiguration.isUptaded(lastEditionFileNameAndDate[1])) {
+                if (MESSAGES.UPDATE(brasindiceRobotConfiguration.isFirstInstallation())) {
+                    deleteBrasindiceDatabase();
+                    File lastEditionFile = new File(brasindiceRobotConfiguration.getSetupPath().getPath() + "/" + lastEditionFileNameAndDate[1]);
+                    String toUriString = UriComponentsBuilder.fromHttpUrl(brasindiceRobotConfiguration.getUrlUploads()).path("/" + lastEditionFileNameAndDate[1]).toUriString();
                     BufferedOutputStream lastEdition = new RestTemplate().execute(toUriString, HttpMethod.GET, null, clientHttpResponse -> {
                         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(lastEditionFile));
                         StreamUtils.copy(clientHttpResponse.getBody(), bufferedOutputStream);
                         return bufferedOutputStream;
                     });
                     lastEdition.close();
-                    MESSAGES.UPDATE_SUCCESS(isFirstInstallation());
                     brasindiceRobotConfiguration.setLastEditionDate(Datas.stringToLocalDate(lastEditionFileNameAndDate[0]));
                     brasindiceRobotConfiguration.setLastEdition(lastEditionFileNameAndDate[1]);
+                    new ConfigurationFileUtil().save(brasindiceRobotConfiguration);
                     //configures database in Brasindice software
                     WindowsUtil windowsUtil = new WindowsUtil();
                     windowsUtil.createDesktopShortcut();
                     windowsUtil.openBrasindiceSoftwareAndConfigureDatabaseV2();
-                    //exports all database files
-                    if (MESSAGES.EXPORT_DATA_FILES()) {
-                        MESSAGES.EXPORT_DATA_FILES_SUCCESS(exportBrasindiceFiles());
-                    }
+                    MESSAGES.UPDATE_SUCCESS(brasindiceRobotConfiguration.isFirstInstallation());
                 }
             }
         } catch (Exception ex) {
@@ -202,46 +215,9 @@ public final class BrasindiceRobot {
      */
     public boolean exportBrasindiceFiles() {
         try {
-            String pmc = getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getPmc());
-            String pfb = getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getPfb());
-            String solution = getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getSolucao());
-            String material = getFormattedExportFileName(brasindiceRobotConfiguration.getExportDataFile().getMaterial());
-            File pmcFile = new File(brasindiceRobotConfiguration.getSetupPath() + "/" + pmc + ".txt");
-            File pfbFile = new File(brasindiceRobotConfiguration.getSetupPath() + "/" + pfb + ".txt");
-            File solutionFile = new File(brasindiceRobotConfiguration.getSetupPath() + "/" + solution + ".txt");
-            File materialFile = new File(brasindiceRobotConfiguration.getSetupPath() + "/" + material + ".txt");
-            new WindowsUtil().exportBrasindiceFiles(pmc, pfb, solution, material);
-            //pmcFile.delete();
-            //pfbFile.delete();
-            //solutionFile.delete();
-            //materialFile.delete();
-            return true;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return false;
-    }
-
-    /**
-     * Get formatted file name
-     *
-     * @param fileName
-     * @return
-     */
-    private String getFormattedExportFileName(String fileName) {
-        return fileName.replaceAll("_.*", "_") + brasindiceRobotConfiguration.getLastEditionDate().format(DateTimeFormatter.ofPattern(fileName.replaceAll(".*_", "")));
-    }
-
-    /**
-     * Delete last database file in installation folder
-     *
-     * @param edition Ex: 950c.GDB
-     * @return true if successful
-     */
-    private boolean deleteBrasindiceDatabase(String edition) {
-        try {
-            if (!isFirstInstallation()) {
-                new File(brasindiceRobotConfiguration.getSetupPath().getPath() + "/" + edition).delete();
+            if (!brasindiceRobotConfiguration.isFilesExported()) {
+                String[] exportFilesNames = brasindiceRobotConfiguration.getExportFilesNames();
+                new WindowsUtil().exportBrasindiceFiles(exportFilesNames[0], exportFilesNames[1], exportFilesNames[2], exportFilesNames[3]);
             }
             return true;
         } catch (Exception ex) {
@@ -250,23 +226,44 @@ public final class BrasindiceRobot {
         return false;
     }
 
-    /**
-     * Verify if installed edition is updated
-     *
-     * @param lastEdition
-     * @return
-     */
-    private boolean isUptaded(String lastEdition) {
-        return brasindiceRobotConfiguration.getLastEdition().equals(lastEdition);
+    public boolean importBrasindiceFiles(boolean saveIntoNetworkDatabase) {
+        try {
+            BrasindiceDataModelRepository repository = SpringContext.getContext().getBean(BrasindiceDataModelRepository.class);
+            brasindiceRobotConfiguration.getExportFiles().stream()
+                    .map(file -> ImportBrasindiceUtil.importBrasindice(
+                            brasindiceRobotConfiguration.getLastEditionDate(),
+                            true,
+                            brasindiceRobotConfiguration.getCspsUser(),
+                            file))
+                    .forEach(list -> {
+                        if (saveIntoNetworkDatabase) repository.saveAll(list);
+                    });
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+    private void deleteExportedFiles() {
+        brasindiceRobotConfiguration.getExportFiles().forEach(File::delete);
     }
 
     /**
-     * Verify if is first installation
+     * Delete last database file in installation folder
      *
-     * @return true if is first installation
+     * @return true if successful
      */
-    private boolean isFirstInstallation() {
-        return brasindiceRobotConfiguration.getLastEdition() == null || "".equals(brasindiceRobotConfiguration.getLastEdition());
+    private boolean deleteBrasindiceDatabase() {
+        try {
+            if (!brasindiceRobotConfiguration.isFirstInstallation()) {
+                brasindiceRobotConfiguration.getAtualDatabaseFile().delete();
+            }
+            return true;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return false;
     }
 
 }

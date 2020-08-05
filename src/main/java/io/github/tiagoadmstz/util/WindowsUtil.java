@@ -125,9 +125,11 @@ public class WindowsUtil {
      * @param materialFileName String with material file name
      */
     public void exportBrasindiceFiles(String pmcFileName, String pfbFileName, String solutionFileName, String materialFileName) {
+        Process process = openBrasindiceSoftware();
         openMedicinesFileExportFrame(pmcFileName, pfbFileName);
         openSolutionFileExportFrame(solutionFileName);
         openMaterialFileExportFrame(materialFileName);
+        if (process != null) process.destroy();
     }
 
     /**
@@ -215,12 +217,13 @@ public class WindowsUtil {
     /**
      * Opens Brasindice software
      */
-    public void openBrasindiceSoftware() {
+    public Process openBrasindiceSoftware() {
         try {
-            Runtime.getRuntime().exec(brasindiceRobotConfiguration.getSetupPath() + "\\Brasindice.exe");
+            return Runtime.getRuntime().exec(brasindiceRobotConfiguration.getSetupPath() + "\\Brasindice.exe");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        return null;
     }
 
     /**

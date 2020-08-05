@@ -1,13 +1,11 @@
 package io.github.tiagoadmstz;
 
-import br.com.dev.engine.date.Datas;
 import io.github.tiagoadmstz.config.BrasindiceRobotConfiguration;
 import io.github.tiagoadmstz.config.SpringContext;
 import io.github.tiagoadmstz.dal.config.BrasindiceDao;
 import io.github.tiagoadmstz.dal.firebird.repositories.SysDbaRepository;
 import io.github.tiagoadmstz.robots.BrasindiceRobot;
 import io.github.tiagoadmstz.util.ConfigurationFileUtil;
-import io.github.tiagoadmstz.util.ImportBrasindiceUtil;
 import io.github.tiagoadmstz.util.KeyboardUtil;
 import io.github.tiagoadmstz.util.WindowsUtil;
 import org.junit.jupiter.api.MethodOrderer;
@@ -18,7 +16,6 @@ import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
-import java.io.File;
 import java.sql.Connection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -113,10 +110,8 @@ public class BrasindiceRobotRobotApplicationTest {
     @Test
     @Order(10)
     public void importBrasindiceFilesTest() {
-        ImportBrasindiceUtil.importBrasindice(Datas.stringToLocalDate("05/06/2020"), true, new File("C:\\Brasindice\\PMC_05062020.txt"));
-        ImportBrasindiceUtil.importBrasindice(Datas.stringToLocalDate("05/06/2020"), true, new File("C:\\Brasindice\\PFB_05062020.txt"));
-        ImportBrasindiceUtil.importBrasindice(Datas.stringToLocalDate("05/06/2020"), true, new File("C:\\Brasindice\\Solucao_05062020.txt"));
-        ImportBrasindiceUtil.importBrasindice(Datas.stringToLocalDate("05/06/2020"), true, new File("C:\\Brasindice\\Material_05062020.txt"));
+        logger.info(() -> "Import pmc, pfb, solution and material file from current database version");
+        assertTrue(new BrasindiceRobot().importBrasindiceFiles(false));
     }
 
     //@Test

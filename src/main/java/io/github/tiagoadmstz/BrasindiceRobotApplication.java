@@ -9,7 +9,7 @@ public class BrasindiceRobotApplication {
     }
 
     private void start() {
-        new BrasindiceRobot().installOrUpdate();
+        new BrasindiceRobot().installOrUpdateAndExportDataFilesAndInsertInNetworkDataBase();
     }
 
 }

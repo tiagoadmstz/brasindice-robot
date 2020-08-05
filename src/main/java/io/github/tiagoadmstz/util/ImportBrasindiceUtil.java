@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,7 +39,7 @@ public abstract class ImportBrasindiceUtil {
      * codigo_tiss = 90206584
      * crlft = ?
      */
-    public static void importBrasindice(LocalDate editionDate, Boolean removeAccentuation, File... files) {
+    public static List<BrasindiceDataModel> importBrasindice(LocalDate editionDate, Boolean removeAccentuation, String cspsUser, File... files) {
         try {
             for (File file : files) {
                 List<String> lines = IOUtils.readLines(new FileInputStream(file), Charset.forName("ISO-8859-1"));
@@ -61,15 +62,17 @@ public abstract class ImportBrasindiceUtil {
                             .codigoBarraEan(strings[13])
                             .codigoBrasindiceTiss(strings[14])
                             .codigoTiss(strings.length == 16 ? strings[15].replaceAll("\"", "") : null)
+                            .idInsercao(cspsUser)
                             .dataPublicacao(editionDate)
                             .arquivoImportado(file.getName().replace(".txt", ""))
                             .build();
                 }).collect(Collectors.toList());
-                modelList.forEach(System.out::println);
+                return modelList;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        return Collections.emptyList();
     }
 
 }
