@@ -30,6 +30,7 @@ Install Winrar software
         "solucao": "Solucao_ddMMyyyy",
         "material": "Material_ddMMyyyy",
     }, 
+    "csps-user": "USER_ID"
     "login": "12345",
     "password": "XXXXXXXX"
 }
@@ -50,4 +51,8 @@ spring:
       password: root
 ```
 
+## Installation and updating 
 ![knowhow](https://github.com/tiagoadmstz/brasindice-robot/blob/master/kh.gif)
+
+## Exporting files and inserting into outer database
+![knowhow2](https://github.com/tiagoadmstz/brasindice-robot/blob/master/kh2.gif)
