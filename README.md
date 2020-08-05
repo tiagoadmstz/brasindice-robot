@@ -6,7 +6,7 @@ This project make Download, install and update database file GDB of the digital 
 Install Winrar software
 
 # External configuration file
-./config/brasindiceRobot/configuration.json
+./config/configuration.json
 ```
 {
     "setup-path": {
