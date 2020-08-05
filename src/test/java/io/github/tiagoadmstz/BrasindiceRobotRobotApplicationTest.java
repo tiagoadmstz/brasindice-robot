@@ -103,10 +103,8 @@ public class BrasindiceRobotRobotApplicationTest {
     @Test
     @Order(9)
     public void exportBrasindiceFilesTest() {
-        BrasindiceRobot brasindiceRobot = new BrasindiceRobot();
-        new WindowsUtil().openBrasindiceSoftware();
         logger.info(() -> "Export pmc, pfb, solution and material file from current database version");
-        assertTrue(brasindiceRobot.exportBrasindiceFiles());
+        assertTrue(new BrasindiceRobot().exportBrasindiceFiles());
     }
 
     @Test

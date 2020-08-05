@@ -63,10 +63,8 @@ public final class BrasindiceRobot {
         if (MESSAGES.EXPORT_DATA_FILES()) {
             boolean exportSuccess = exportBrasindiceFiles();
             if (exportSuccess) {
-                boolean saveSuccess = importBrasindiceFiles(brasindiceRobotConfiguration.getSaveIntoNetworkDatabase());
-                if (saveSuccess && brasindiceRobotConfiguration.getDeleteExportedFiles()) {
-                    deleteExportedFiles();
-                }
+                importBrasindiceFiles(brasindiceRobotConfiguration.getSaveIntoNetworkDatabase());
+                if (brasindiceRobotConfiguration.getDeleteExportedFiles()) deleteExportedFiles();
             }
             MESSAGES.EXPORT_DATA_FILES_SUCCESS(exportSuccess);
         }
