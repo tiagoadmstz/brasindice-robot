@@ -39,6 +39,7 @@ public final class BrasindiceRobot {
     public void installOrUpdateAndExportDataFilesAndInsertInNetworkDataBase() {
         installOrUpdate();
         exportDataFilesAndInsertInNetworkDataBase();
+        System.exit(0);
     }
 
     /**

@@ -16,7 +16,9 @@ import org.junit.platform.commons.logging.Logger;
 import org.junit.platform.commons.logging.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 
+import java.io.File;
 import java.sql.Connection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -112,6 +114,16 @@ public class BrasindiceRobotRobotApplicationTest {
     public void importBrasindiceFilesTest() {
         logger.info(() -> "Import pmc, pfb, solution and material file from current database version");
         assertTrue(new BrasindiceRobot().importBrasindiceFiles(false));
+    }
+
+    @Test
+    @Order(11)
+    public void deleteExportedFilesTest() {
+        logger.info(() -> "Deleting exported files");
+        BrasindiceRobotConfiguration configuration = new ConfigurationFileUtil().load();
+        List<File> exportFiles = configuration.getExportFiles();
+        exportFiles.forEach(File::delete);
+        assertFalse(configuration.isFilesExported());
     }
 
     //@Test
