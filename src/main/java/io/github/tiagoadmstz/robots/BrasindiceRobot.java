@@ -32,8 +32,7 @@ public final class BrasindiceRobot {
     private WebClient webClient;
 
     public BrasindiceRobot() {
-        this.brasindiceRobotConfiguration = new ConfigurationFileUtil().load();
-        initWebClient();
+        loadConfigurationFile();
     }
 
     public void installOrUpdateAndExportDataFilesAndInsertInNetworkDataBase() {
@@ -46,16 +45,20 @@ public final class BrasindiceRobot {
      * Install or update Brasindice software
      */
     public void installOrUpdate() {
-        ConfigurationFileUtil configurationFileUtil = new ConfigurationFileUtil();
-        if (brasindiceRobotConfiguration == null) {
-            configurationFileUtil.create();
-            brasindiceRobotConfiguration = configurationFileUtil.load();
-        }
+        loadConfigurationFile();
         if (!brasindiceRobotConfiguration.getIsInstaled()) {
             createInstallationPath();
             downloadBrasindiceSoftwareAndUnrar();
         } else {
             downloadAndConfigureBrasindiceDatabase();
+        }
+    }
+
+    private void loadConfigurationFile() {
+        ConfigurationFileUtil configurationFileUtil = new ConfigurationFileUtil();
+        if (brasindiceRobotConfiguration == null) {
+            configurationFileUtil.create();
+            brasindiceRobotConfiguration = configurationFileUtil.load();
         }
     }
 
@@ -112,6 +115,7 @@ public final class BrasindiceRobot {
         try {
             File rarFile = new File(brasindiceRobotConfiguration.getSetupPath() + "\\brasindice.rar");
             if (!rarFile.exists()) {
+                initWebClient();
                 WebResponse webResponse = webClient.getPage(brasindiceRobotConfiguration.getUrlDownload()).getWebResponse();
                 InputStream inputStream = webResponse.getContentAsStream();
                 FileOutputStream outputStream = new FileOutputStream(rarFile);

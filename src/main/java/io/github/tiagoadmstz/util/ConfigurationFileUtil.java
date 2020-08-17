@@ -13,10 +13,12 @@ import java.util.stream.Collectors;
 
 public class ConfigurationFileUtil {
 
+    private final File path;
     private final File file;
 
     public ConfigurationFileUtil() {
-        this.file = new File(System.getProperty("user.dir") + "/config/configuration.json");
+        this.path = new File(System.getProperty("user.dir") + "\\config");
+        this.file = new File(path.getPath() + "\\configuration.json");
     }
 
     /**
@@ -26,6 +28,7 @@ public class ConfigurationFileUtil {
      */
     public boolean create() {
         try {
+            if (!path.exists()) path.mkdir();
             if (!file.exists()) {
                 String login = JOptionPane.showInputDialog("Informe o login");
                 String password = JOptionPane.showInputDialog("Informe a senha");
