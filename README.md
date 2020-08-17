@@ -22,6 +22,8 @@ Install Winrar software
     "last-edition": "950c.GDB",
     "last-edition-date": "05/06/2020",
     "remove-accentuation": true,
+    "active-install-update": true,
+    "active-export-files": true,
     "delete-exported-files": false,
     "save-into-network-database": false,
     "export-file-names": {
