@@ -18,7 +18,7 @@ public class Medicamento implements Serializable {
     @Id
     @Column(name = "BRAMEDCODIGO")
     private String codigo;
-    @Column(name = "BRAMEDDESCRICAO", columnDefinition = "blob")//BRALABSUBSDESCRICAO
+    @Column(name = "BRAMEDDESCRICAO")//BRALABSUBSDESCRICAO
     private String descricao;
     @Column(name = "BRAMEDFLAG")
     private String flag;

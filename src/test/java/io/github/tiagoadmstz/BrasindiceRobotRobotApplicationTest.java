@@ -3,6 +3,7 @@ package io.github.tiagoadmstz;
 import io.github.tiagoadmstz.config.BrasindiceRobotConfiguration;
 import io.github.tiagoadmstz.config.SpringContext;
 import io.github.tiagoadmstz.dal.config.BrasindiceDao;
+import io.github.tiagoadmstz.dal.firebird.repositories.MedicamentoRepository;
 import io.github.tiagoadmstz.dal.firebird.repositories.SysDbaRepository;
 import io.github.tiagoadmstz.robots.BrasindiceRobot;
 import io.github.tiagoadmstz.util.ConfigurationFileUtil;
@@ -166,9 +167,9 @@ public class BrasindiceRobotRobotApplicationTest {
         //laboratorioRepository.findAll().forEach(System.out::println);
         //LaboratorioSubstanciaRepository laboratorioSubstanciaRepository = context.getBean(LaboratorioSubstanciaRepository.class);
         //laboratorioSubstanciaRepository.findAll().forEach(System.out::println);
-        //MedicamentoRepository medicamentoRepository = context.getBean(MedicamentoRepository.class);
+        MedicamentoRepository medicamentoRepository = context.getBean(MedicamentoRepository.class);
         //medicamentoRepository.findAll().stream().limit(100).forEach(System.out::println);
-        //medicamentoRepository.findByCodigo("21031");
+        medicamentoRepository.findByCodigo("21031");
         //MedicamentoSubstanciaRepository medicamentoSubstanciaRepository = context.getBean(MedicamentoSubstanciaRepository.class);
         //medicamentoSubstanciaRepository.findAll().forEach(System.out::println);
         //NovoRepository novoRepository = context.getBean(NovoRepository.class);
@@ -185,8 +186,8 @@ public class BrasindiceRobotRobotApplicationTest {
         //SubstanciaRepository substanciaRepository = context.getBean(SubstanciaRepository.class);
         //substanciaRepository.findAll().forEach(System.out::println);
 
-        SysDbaRepository sysDbaRepository = context.getBean(SysDbaRepository.class);
-        sysDbaRepository.findAll().forEach(System.out::println);
+        //SysDbaRepository sysDbaRepository = context.getBean(SysDbaRepository.class);
+        //sysDbaRepository.findAll().forEach(System.out::println);
 
         //BrasindiceDataModelRepository brasindiceDataModelRepository = context.getBean(BrasindiceDataModelRepository.class);
         //brasindiceDataModelRepository.findAll().forEach(System.out::println);
