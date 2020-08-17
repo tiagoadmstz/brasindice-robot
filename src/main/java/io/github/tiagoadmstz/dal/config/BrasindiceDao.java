@@ -35,7 +35,7 @@ public class BrasindiceDao {
         properties1.put("RoleName", "RoleName");
         properties1.put("encoding", "UNICODE_FSS");
 
-        return driver.connect("jdbc:firebirdsql:embedded:" + brasindiceRobotConfiguration.getSetupPath() + "\\BRASDB.GDB", properties1);
+        return driver.connect("jdbc:firebirdsql:embedded:" + brasindiceRobotConfiguration.getSetupPath() + "\\950c.GDB", properties1);
     }
 
     public void createDataBase(File file) {

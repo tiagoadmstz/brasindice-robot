@@ -18,26 +18,13 @@ import static io.github.tiagoadmstz.util.WordUtils.removeAccentuation;
 public abstract class ImportBrasindiceUtil {
 
     /**
-     * Import Brasindice file with layout
-     * <p>
-     * Exemplo:
-     * codigo_laboratorio = 001
-     * nome_laboratorio = UNIAO QUIMICA
-     * codigo_medicamento = 00001
-     * nome_medicamento = A CURITYBINA
-     * codigo_apresentacao = AJOX
-     * nome_apresentacao = Cx. 1 fr.
-     * preco_med = 0.00
-     * quantidade = 1
-     * tipo_preco = PMC
-     * preco_unitario = 0.00
-     * edicao = 922
-     * ipi_med = 0.00
-     * portaria = N
-     * codigo_ean = 7896006211808
-     * codigo_bras_tiss = 0000000001
-     * codigo_tiss = 90206584
-     * crlft = ?
+     * Transforms files lines to BrasindiceDataModel list
+     *
+     * @param editionDate LocalDate with edition date to all registers
+     * @param removeAccentuation Boolean to inform if remove accentuation or not
+     * @param cspsUser String with csps user name to all registers
+     * @param files Array with files with exported registers
+     * @return List of the BrasindiceDataModel
      */
     public static List<BrasindiceDataModel> importBrasindice(LocalDate editionDate, Boolean removeAccentuation, String cspsUser, File... files) {
         try {
@@ -65,7 +52,8 @@ public abstract class ImportBrasindiceUtil {
                             .idInsercao(cspsUser)
                             .dataPublicacao(editionDate)
                             .arquivoImportado(file.getName().replace(".txt", ""))
-                            .build();
+                            .build()
+                            .verifyTipoMatMed();
                 }).collect(Collectors.toList());
                 return modelList;
             }

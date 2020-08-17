@@ -58,7 +58,11 @@ public class FirebirdConfiguration {
             @Qualifier("fbDataSource") DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(dataSource);
-        entityManagerFactoryBean.setPackagesToScan("io.github.tiagoadmstz.dal.firebird.models", "io.github.tiagoadmstz.dal.firebird.sysmodels", "io.github.tiagoadmstz.dal.converters");
+        entityManagerFactoryBean.setPackagesToScan(
+                "io.github.tiagoadmstz.dal.firebird.models",
+                "io.github.tiagoadmstz.dal.firebird.sysmodels",
+                "io.github.tiagoadmstz.dal.converters"
+        );
         entityManagerFactoryBean.setJpaPropertyMap(getProperties());
         entityManagerFactoryBean.setPersistenceUnitName("firebirdPU");
         entityManagerFactoryBean.setJpaVendorAdapter(eclipseLinkJpaBaseConfiguration.createJpaVendorAdapter());

@@ -89,4 +89,9 @@ public class BrasindiceDataModel implements Serializable {
     @Convert(converter = TipoMatMedConverter.class)
     private TIPO_MAT_MED tipoMatMed = TIPO_MAT_MED.USO_CONSUMO_HOSPILAR;
 
+    public BrasindiceDataModel verifyTipoMatMed() {
+        tipoMatMed = nomeMedicamento.toUpperCase().contains("RESTRITO HOSP") ? TIPO_MAT_MED.USO_RESTRITO_HOSPITALAR : TIPO_MAT_MED.USO_CONSUMO_HOSPILAR;
+        return this;
+    }
+
 }

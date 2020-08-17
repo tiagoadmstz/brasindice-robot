@@ -1,6 +1,7 @@
 package io.github.tiagoadmstz.config;
 
 import io.github.tiagoadmstz.dal.config.EclipseLinkJpaBaseConfiguration;
+import io.github.tiagoadmstz.dal.config.FirebirdConfiguration;
 import io.github.tiagoadmstz.dal.config.OracleConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -21,7 +22,7 @@ public abstract class SpringContext {
                 SpringConfiguration.class,
                 EclipseLinkJpaBaseConfiguration.class,
                 OracleConfiguration.class
-                //, FirebirdConfiguration.class);
+                //, FirebirdConfiguration.class
         );
         context.refresh();
         return context;
