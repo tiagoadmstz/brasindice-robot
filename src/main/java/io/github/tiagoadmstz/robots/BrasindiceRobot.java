@@ -234,6 +234,7 @@ public final class BrasindiceRobot {
             BrasindiceDataModelRepository repository = SpringContext.getContext().getBean(BrasindiceDataModelRepository.class);
             brasindiceRobotConfiguration.getExportFiles().stream()
                     .map(file -> ImportBrasindiceUtil.importBrasindice(
+                            brasindiceRobotConfiguration.getLastEdition().replaceAll("[^\\d]", ""),
                             brasindiceRobotConfiguration.getLastEditionDate(),
                             true,
                             brasindiceRobotConfiguration.getCspsUser(),
@@ -249,7 +250,7 @@ public final class BrasindiceRobot {
     }
 
     private void deleteExportedFiles() {
-        brasindiceRobotConfiguration.getExportFiles().forEach(File::delete);
+        brasindiceRobotConfiguration.getExportFiles().forEach(File::deleteOnExit);
     }
 
     /**
