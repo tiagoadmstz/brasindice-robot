@@ -121,7 +121,7 @@ public class BrasindiceRobotRobotApplicationTest {
         logger.info(() -> "Deleting exported files");
         BrasindiceRobotConfiguration configuration = new ConfigurationFileUtil().load();
         List<File> exportFiles = configuration.getExportFiles();
-        exportFiles.forEach(File::delete);
+        exportFiles.forEach(File::deleteOnExit);
         assertFalse(configuration.isFilesExported());
     }
 

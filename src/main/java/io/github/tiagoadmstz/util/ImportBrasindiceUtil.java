@@ -20,13 +20,14 @@ public abstract class ImportBrasindiceUtil {
     /**
      * Transforms files lines to BrasindiceDataModel list
      *
-     * @param editionDate LocalDate with edition date to all registers
+     * @param edition            String with actual edition number
+     * @param editionDate        LocalDate with edition date to all registers
      * @param removeAccentuation Boolean to inform if remove accentuation or not
-     * @param cspsUser String with csps user name to all registers
-     * @param files Array with files with exported registers
+     * @param cspsUser           String with csps user name to all registers
+     * @param files              Array with files with exported registers
      * @return List of the BrasindiceDataModel
      */
-    public static List<BrasindiceDataModel> importBrasindice(LocalDate editionDate, Boolean removeAccentuation, String cspsUser, File... files) {
+    public static List<BrasindiceDataModel> importBrasindice(String edition, LocalDate editionDate, Boolean removeAccentuation, String cspsUser, File... files) {
         try {
             for (File file : files) {
                 List<String> lines = IOUtils.readLines(new FileInputStream(file), Charset.forName("ISO-8859-1"));
@@ -46,15 +47,15 @@ public abstract class ImportBrasindiceUtil {
                             .edicao(strings[10])
                             .ipiMedicamento(BigDecimal.valueOf(Double.parseDouble(strings[11])))
                             .portariaPisCofins(PORTARIA_PISCOFINS.parse(strings[12]))
-                            .codigoBarraEan(strings[13])
-                            .codigoBrasindiceTiss(strings[14])
-                            .codigoTiss(strings.length == 16 ? strings[15].replaceAll("\"", "") : null)
+                            .codigoBarraEan(strings.length == 16 ? strings[13] : "")
+                            .codigoBrasindiceTiss(strings.length == 16 ? strings[14].replaceAll("\"", "") : strings[13].replaceAll("\"", ""))
+                            .codigoTiss(strings.length == 16 ? strings[15].replaceAll("\"", "") : strings[14].replaceAll("\"", ""))
                             .idInsercao(cspsUser)
                             .dataPublicacao(editionDate)
                             .arquivoImportado(file.getName().replace(".txt", ""))
                             .build()
                             .verifyTipoMatMed();
-                }).collect(Collectors.toList());
+                }).filter(model -> model.getEdicao().equals(edition)).collect(Collectors.toList());
                 return modelList;
             }
         } catch (Exception ex) {
