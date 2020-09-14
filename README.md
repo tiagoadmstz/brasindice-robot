@@ -38,7 +38,7 @@ Install Winrar software
 }
 ```
 
-# YAML confiration file - Database configuration
+# YAML configuration file - Database configuration
 ./src/main/resources/application.yml
 ```
 spring:
